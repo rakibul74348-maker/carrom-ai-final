@@ -19,15 +19,19 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
 
+    - name: Download Compatible Gradle 8.5
+      run: |
+        wget -q https://services.gradle.org/distributions/gradle-8.5-bin.zip
+        unzip -q gradle-8.5-bin.zip
+        echo "$GITHUB_WORKSPACE/gradle-8.5/bin" >> $GITHUB_PATH
+
     - name: Assemble Complete Project Structure
       run: |
-        # আগের ভুল পাথের ফাইলগুলো খুঁজে সঠিক জায়গায় কপি করা
         mkdir -p app/src/main/java/com/rakib/ai
         find . -name "AutoSwipeService.kt" -exec cp {} app/src/main/java/com/rakib/ai/ \; 2>/dev/null || true
         find . -name "MainActivity.kt" -exec cp {} app/src/main/java/com/rakib/ai/ \; 2>/dev/null || true
         find . -name "dialog.java" -exec cp {} app/src/main/java/com/rakib/ai/ \; 2>/dev/null || true
 
-        # রিসোর্স ও কনফিগ ফোল্ডার
         mkdir -p app/src/main/res/values
         mkdir -p app/src/main/res/xml
 
@@ -109,8 +113,8 @@ jobs:
 
         cat << 'EOF' > build.gradle
         plugins {
-            id 'com.android.application' version '8.2.0' apply false
-            id 'org.jetbrains.kotlin.android' version '1.9.20' apply false
+            id 'com.android.application' version '8.2.2' apply false
+            id 'org.jetbrains.kotlin.android' version '1.9.22' apply false
         }
         EOF
 
@@ -152,11 +156,9 @@ jobs:
         }
         EOF
 
-    - name: Generate Gradle Wrapper
-      run: gradle wrapper --gradle-version 8.5
-
-    - name: Build Debug APK with Wrapper
-      run: ./gradlew assembleDebug --no-daemon
+    - name: Build Debug APK
+      run: |
+        gradle-8.5/bin/gradle :app:assembleDebug --no-daemon
 
     - name: Upload APK
       uses: actions/upload-artifact@v4
