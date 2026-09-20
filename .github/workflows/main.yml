@@ -35,6 +35,12 @@ jobs:
         mkdir -p app/src/main/res/values
         mkdir -p app/src/main/res/xml
 
+        cat << 'EOF' > gradle.properties
+        android.useAndroidX=true
+        android.enableJetifier=true
+        org.gradle.jvmargs=-Xmx2048m
+        EOF
+
         cat << 'EOF' > app/src/main/res/values/strings.xml
         <resources>
             <string name="app_name">Carrom AI VIP</string>
