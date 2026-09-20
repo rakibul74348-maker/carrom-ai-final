@@ -19,7 +19,10 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
 
-    - name: Assemble Project Files
+    - name: Setup Android SDK
+      uses: android-actions/setup-android@v3
+
+    - name: Assemble Complete Project Structure
       run: |
         mkdir -p app/src/main/res/values
         mkdir -p app/src/main/res/xml
@@ -82,26 +85,28 @@ jobs:
         EOF
 
         cat << 'EOF' > settings.gradle
-        include ':app'
+        pluginManagement {
+            repositories {
+                google()
+                mavenCentral()
+                gradlePluginPortal()
+            }
+        }
+        dependencyResolutionManagement {
+            repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+            repositories {
+                google()
+                mavenCentral()
+            }
+        }
         rootProject.name = "CarromAIVIP"
+        include ':app'
         EOF
 
         cat << 'EOF' > build.gradle
-        buildscript {
-            repositories {
-                google()
-                mavenCentral()
-            }
-            dependencies {
-                classpath 'com.android.tools.build:gradle:8.2.2'
-                classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.22'
-            }
-        }
-        allprojects {
-            repositories {
-                google()
-                mavenCentral()
-            }
+        plugins {
+            id 'com.android.application' version '8.2.2' apply false
+            id 'org.jetbrains.kotlin.android' version '1.9.22' apply false
         }
         EOF
 
@@ -127,9 +132,6 @@ jobs:
                 release {
                     minifyEnabled false
                 }
-                debug {
-                    signingConfig signingConfigs.debug
-                }
             }
 
             compileOptions {
@@ -143,7 +145,6 @@ jobs:
 
         dependencies {
             implementation 'androidx.core:core-ktx:1.12.0'
-            implementation 'androidx.appcompat:appcompat:1.6.1'
         }
         EOF
 
@@ -151,7 +152,7 @@ jobs:
       uses: gradle/actions/setup-gradle@v3
 
     - name: Build Debug APK
-      run: gradle assembleDebug --no-daemon -x test
+      run: gradle :app:assembleDebug --no-daemon --stacktrace
 
     - name: Upload APK
       uses: actions/upload-artifact@v4
