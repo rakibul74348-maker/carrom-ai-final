@@ -1,0 +1,14 @@
+{
+  "status": "active",
+  "notice": "Welcome to Rakib AI VIP",
+  "keys": {
+    "RAKIB-VIP-2026": {
+      "valid": true,
+      "days": 30
+    },
+    "RAKIB-7DAY-TEST": {
+      "valid": true,
+      "days": 7
+    }
+  }
+}
